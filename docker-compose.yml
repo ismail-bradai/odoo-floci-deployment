@@ -1,0 +1,213 @@
+
+services:
+
+
+
+  floci:
+
+    image: floci/floci:latest
+
+    container_name: floci
+
+    restart: unless-stopped
+
+    ports:
+
+      - "4566:4566"
+
+    volumes:
+
+      - /var/run/docker.sock:/var/run/docker.sock
+
+      - floci-data:/app/data
+
+    user: root
+
+    environment:
+
+      - PERSISTENCE=1
+
+    healthcheck:
+
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_floci/health"]
+
+      interval: 10s
+
+      timeout: 5s
+
+      retries: 5
+
+
+
+  eks:
+
+    image: rancher/k3s:latest
+
+    container_name: floci-eks-odoo-cluster
+
+    hostname: floci-eks-odoo-cluster
+
+    restart: unless-stopped
+
+    privileged: true
+
+    ports:
+
+      - "6500:6443"
+
+    environment:
+
+      - K3S_TOKEN=odoo-cluster-secret-token-fixed
+
+    command: >
+
+      server
+
+      --disable traefik
+
+      --cluster-init
+
+    depends_on:
+
+      floci:
+
+        condition: service_healthy
+
+
+
+  nodepool-prod:
+
+    image: rancher/k3s:latest
+
+    container_name: k3s-nodepool-prod
+
+    hostname: nodepool-prod
+
+    restart: unless-stopped
+
+    privileged: true
+
+    volumes:
+
+      - nodepool-prod-data:/var/lib/rancher/k3s
+
+    environment:
+
+      - K3S_URL=https://eks:6443
+
+      - K3S_TOKEN=odoo-cluster-secret-token-fixed
+
+    command: >
+
+      agent
+
+      --node-name=nodepool-prod
+
+      --node-label=role=prod
+
+      --node-label=eks.amazonaws.com/nodegroup=prod-pool
+
+      --node-label=node.kubernetes.io/instance-type=t3.medium
+
+    depends_on:
+
+      - eks
+
+
+
+  nodepool-test:
+
+    image: rancher/k3s:latest
+
+    container_name: k3s-nodepool-test
+
+    hostname: nodepool-test
+
+    restart: unless-stopped
+
+    privileged: true
+
+    volumes:
+
+      - nodepool-test-data:/var/lib/rancher/k3s
+
+    environment:
+
+      - K3S_URL=https://eks:6443
+
+      - K3S_TOKEN=odoo-cluster-secret-token-fixed
+
+    command: >
+
+      agent
+
+      --node-name=nodepool-test
+
+      --node-label=role=test
+
+      --node-label=eks.amazonaws.com/nodegroup=test-pool
+
+      --node-label=node.kubernetes.io/instance-type=t3.small
+
+    depends_on:
+
+      - eks
+
+
+
+  init-aws:
+
+    image: floci/floci:latest-aws
+
+    container_name: floci-init
+
+    restart: on-failure
+
+    depends_on:
+
+      floci:
+
+        condition: service_healthy
+
+    environment:
+
+      - AWS_ACCESS_KEY_ID=test
+
+      - AWS_SECRET_ACCESS_KEY=test
+
+      - AWS_DEFAULT_REGION=us-east-1
+
+      - AWS_ENDPOINT_URL=http://floci:4566
+
+    volumes:
+
+      - ./init:/init
+
+    entrypoint: ["/bin/sh", "/init/setup.sh"]
+
+
+
+volumes:
+
+  floci-data:
+
+    name: floci-data
+
+  nodepool-prod-data:
+
+    name: nodepool-prod-data
+
+  nodepool-test-data:
+
+    name: nodepool-test-data
+
+
+
+networks:
+
+  floci-network:
+
+    name: floci-network
+
+    driver: bridge
+

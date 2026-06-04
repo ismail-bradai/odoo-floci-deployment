@@ -1,0 +1,41 @@
+
+apiVersion: v1
+
+kind: ConfigMap
+
+metadata:
+
+  name: odoo-config
+
+  namespace: odoo-test
+
+data:
+
+  odoo.conf: |
+
+    [options]
+
+    db_host = 172.18.0.3
+    db_port = 5432
+    db_user = odoo_admin
+    db_password = Valorant#12345
+    dbfilter = testing-data
+    # Logging
+    log_handler = werkzeug:INFO, :DEBUG
+    logfile = /var/log/odoo/odoo.log
+    logrotate = True
+    addons_path = /usr/lib/python3/dist-packages/odoo/addons, /mnt/extra-addons
+    data_dir = /var/lib/odoo
+    list_db = True
+    proxy_mode = True
+    workers = 0
+    longpolling_port = 8072
+    max_cron_threads = 1
+    server_wide_modules = base,web,s3_attachment_manager_v2
+    ir_attachment.location = s3
+    limit_memory_hard = 2684354560
+    limit_memory_soft = 2147483648
+
+    limit_request = 8192
+    limit_time_cpu = 600
+    limit_time_real = 1200

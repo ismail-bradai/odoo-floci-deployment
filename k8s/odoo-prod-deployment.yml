@@ -1,0 +1,191 @@
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+
+  name: odoo-prod
+
+  namespace: odoo-prod
+
+spec:
+
+  replicas: 3
+
+  selector:
+
+    matchLabels:
+
+      app: odoo
+
+      env: production
+
+  strategy:
+
+    type: RollingUpdate
+
+    rollingUpdate:
+
+      maxSurge: 1
+
+      maxUnavailable: 0
+
+  template:
+
+    metadata:
+
+      labels:
+
+        app: odoo
+
+        env: production
+
+    spec:
+
+      nodeSelector:
+
+        role: prod
+
+        eks.amazonaws.com/nodegroup: prod-pool
+
+      tolerations:
+
+        - key: "role"
+
+          operator: "Equal"
+
+          value: "prod"
+
+          effect: "NoSchedule"
+
+      securityContext:
+
+        runAsUser: 0
+
+        runAsGroup: 0
+
+        fsGroup: 0
+
+      terminationGracePeriodSeconds: 60
+
+      containers:
+
+        - name: odoo
+
+          image: ismail20022/odoo-15-boto3
+
+          ports:
+
+            - containerPort: 8069
+
+            - containerPort: 8072
+
+          envFrom:
+
+            - secretRef:
+
+                name: odoo-secret
+
+          env:
+
+            - name: HOST
+
+              value: "172.18.0.3"
+
+            - name: USER
+
+              value: "odoo_admin"
+
+            - name: PASSWORD
+
+              value: "Valorant#12345"
+
+          #readinessProbe:
+
+           # httpGet:
+
+            #  path: /web/health
+
+             # port: 8069
+
+            #initialDelaySeconds: 30
+
+            #periodSeconds: 10
+
+            #failureThreshold: 3
+
+          #livenessProbe:
+
+           # httpGet:
+
+            #  path: /web/health
+
+             # port: 8069
+
+            #initialDelaySeconds: 60
+
+           # periodSeconds: 30
+
+            #failureThreshold: 5
+
+          #lifecycle:
+
+           # preStop:
+
+            #  exec:
+
+             #   command: ["/bin/sh", "-c", "sleep 15"]
+
+          volumeMounts:
+
+            - name: odoo-config
+
+              mountPath: /etc/odoo/odoo.conf
+
+              subPath: odoo.conf
+
+            - name: odoo-data
+
+              mountPath: /var/lib/odoo
+
+            - name: odoo-logs
+
+              mountPath: /var/log/odoo
+
+            - name: odoo-addons
+
+              mountPath: /mnt/extra-addons
+
+      #    resources:
+       #     requests:
+        #      memory: "512Mi"
+         #     cpu: "250m"      # HPA calcule le % par rapport à cette valeur
+          #  limits:
+           #   memory: "2Gi"
+            #  cpu: "1000m"
+
+      volumes:
+
+        - name: odoo-config
+
+          configMap:
+
+            name: odoo-config
+
+        - name: odoo-data
+
+          persistentVolumeClaim:
+
+            claimName: odoo-prod-data-pvc
+
+        - name: odoo-logs
+
+          persistentVolumeClaim:
+
+            claimName: odoo-prod-logs-pvc
+
+        - name: odoo-addons
+
+          persistentVolumeClaim:
+
+            claimName: odoo-prod-addons-pvc

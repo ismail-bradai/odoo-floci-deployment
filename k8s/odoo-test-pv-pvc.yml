@@ -1,0 +1,167 @@
+
+# ── Data PV ──
+
+apiVersion: v1
+
+kind: PersistentVolume
+
+metadata:
+
+  name: odoo-test-data-pv
+
+spec:
+
+  capacity:
+
+    storage: 5Gi
+
+  accessModes:
+
+    - ReadWriteOnce
+
+  persistentVolumeReclaimPolicy: Retain
+
+  storageClassName: local-storage
+
+  hostPath:
+
+    path: /mnt/odoo/test/data
+
+---
+
+apiVersion: v1
+
+kind: PersistentVolumeClaim
+
+metadata:
+
+  name: odoo-test-data-pvc
+
+  namespace: odoo-test
+
+spec:
+
+  accessModes:
+
+    - ReadWriteOnce
+
+  storageClassName: local-storage
+
+  resources:
+
+    requests:
+
+      storage: 5Gi
+
+---
+
+# ── Logs PV ──
+
+apiVersion: v1
+
+kind: PersistentVolume
+
+metadata:
+
+  name: odoo-test-logs-pv
+
+spec:
+
+  capacity:
+
+    storage: 2Gi
+
+  accessModes:
+
+    - ReadWriteOnce
+
+  persistentVolumeReclaimPolicy: Retain
+
+  storageClassName: local-storage
+
+  hostPath:
+
+    path: /mnt/odoo/test/logs
+
+---
+
+apiVersion: v1
+
+kind: PersistentVolumeClaim
+
+metadata:
+
+  name: odoo-test-logs-pvc
+
+  namespace: odoo-test
+
+spec:
+
+  accessModes:
+
+    - ReadWriteOnce
+
+  storageClassName: local-storage
+
+  resources:
+
+    requests:
+
+      storage: 2Gi
+
+---
+
+# ── Addons PV ──
+
+apiVersion: v1
+
+kind: PersistentVolume
+
+metadata:
+
+  name: odoo-test-addons-pv
+
+spec:
+
+  capacity:
+
+    storage: 2Gi
+
+  accessModes:
+
+    - ReadWriteOnce
+
+  persistentVolumeReclaimPolicy: Retain
+
+  storageClassName: local-storage
+
+  hostPath:
+
+    path: /mnt/odoo/test/addons
+
+---
+
+apiVersion: v1
+
+kind: PersistentVolumeClaim
+
+metadata:
+
+  name: odoo-test-addons-pvc
+
+  namespace: odoo-test
+
+spec:
+
+  accessModes:
+
+    - ReadWriteOnce
+
+  storageClassName: local-storage
+
+  resources:
+
+    requests:
+
+      storage: 2Gi
+

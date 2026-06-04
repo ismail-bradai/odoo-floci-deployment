@@ -1,0 +1,6 @@
+*.log
+*.sql
+pg-backups/
+__pycache__/
+*.pyc
+.env

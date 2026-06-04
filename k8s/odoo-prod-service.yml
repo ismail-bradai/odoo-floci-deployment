@@ -1,0 +1,35 @@
+
+apiVersion: v1
+
+kind: Service
+
+metadata:
+
+  name: odoo-service
+
+  namespace: odoo-prod
+
+spec:
+
+  selector:
+
+    app: odoo
+
+    env: production
+
+  type: ClusterIP
+
+  ports:
+
+    - name: http
+
+      port: 80
+
+      targetPort: 8069
+
+    - name: longpolling
+
+      port: 8072
+
+      targetPort: 8072
+
