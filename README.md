@@ -179,20 +179,3 @@ aws s3 ls s3://odoo-prod-filestore --recursive | wc -l
 ## 👤 Author
 **Ismail Bradai** — Infrastructure Intern 2026  
 [@ismail-bradai](https://github.com/ismail-bradai)
-
----
-
-## 📄 License
-MIT
-bash# Créer le README sur la VM
-cat > ~/floci-odoo/README.md << 'README'
-# 🚀 Odoo 15 Deployment on Floci (Local AWS Emulator)
-... (coller le contenu ci-dessus)
-README
-
-# Commiter et pusher
-cd ~/floci-odoo
-git add README.md
-git commit -m "docs: add comprehensive README"
-git push github main
-git push origin dev
