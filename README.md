@@ -15,7 +15,7 @@ Already a pro? Just edit this README.md and make it your own. Want to make it ea
 
 ```
 cd existing_repo
-git remote add origin https://gitlab.com/healio_internships_2026_infra001/infra001_int001.git
+git remote add origin https://github.com/ismail-bradai/odoo-floci-deployment.git
 git branch -M main
 git push -uf origin main
 ```
